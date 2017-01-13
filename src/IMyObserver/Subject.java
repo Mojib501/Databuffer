@@ -10,7 +10,9 @@ package IMyObserver;
  * @author mojib
  */
 public abstract class Subject {
-    public abstract void addFeature(Feature observer);
-    public abstract void removeFrature(Feature observer);
+    public abstract void register(IFeatureObserver observer);
+    public abstract void unregister(IFeatureObserver observer);
+    public abstract void notifyObserver(IFeatureObserver observer);
     public abstract void notifyAllObserver();
+    
 }

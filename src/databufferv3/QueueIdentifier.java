@@ -22,7 +22,7 @@ public class QueueIdentifier {
     public IDeviceDescriptor getDesc(){
         return desc;
     }
-    public int getMDid(){
+    public int getmDid(){
         return measurmentDeviceID;
     }
     public String toString(){
