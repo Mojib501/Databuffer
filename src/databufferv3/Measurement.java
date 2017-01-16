@@ -15,6 +15,7 @@ public class Measurement {
     private DataMessageSingle singleMsg;
     private long timeStamp;
     private int mdID;
+    private int counter=1;
     
     
      public Measurement(DataMessageSingle singleMsg, long timeStamp, int mdID){
@@ -27,6 +28,12 @@ public class Measurement {
     }
     public Integer[] getMetrics(){
         return singleMsg.getMetrics();
+    }
+    public void count(){
+        this.counter++;
+    }
+    public int getCounter(){
+        return this.counter;
     }
     public String toString(){
         return null;

@@ -6,8 +6,10 @@
 package Features;
 import IMyObserver.IFeatureObserver;
 import databufferv3.*;
+import de.hsulm.cermit.exchangableinterface.IDeviceDescriptor;
+import de.hsulm.cermit.implementations.BluetoothDeviceDescriptor;
 import de.hsulm.cermit.sensorunitmodel.Channel;
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -15,12 +17,23 @@ import java.util.List;
  * @author mojib
  */
 public class Feature1 implements IFeatureObserver{
-    private QueueIdentifier qId;
-    private int deltaTimeStamp;
+    private int deltaTimeStamp = 1;
     private Channel channel;
-    private List<Measurement> measureList = new ArrayList<>();
+    IDeviceDescriptor devDesc = new BluetoothDeviceDescriptor("0007806e65b0","UNIT-Rev3-ID-4");
 
+    private QueueIdentifier qId = new QueueIdentifier(devDesc, 0);
     
+    private List<Measurement> measureList = new LinkedList<>();
+
+//    
+//    
+//    
+//    
+//  
+    public void calc() {
+       System.out.println(measureList);
+       measureList.removeAll(measureList);
+    }
     @Override
     public void update(List<Measurement> measureList) {
         this.measureList = measureList;

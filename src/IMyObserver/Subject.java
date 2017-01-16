@@ -5,6 +5,9 @@
  */
 package IMyObserver;
 
+import databufferv3.Measurement;
+import java.util.List;
+
 /**
  *
  * @author mojib
@@ -12,7 +15,7 @@ package IMyObserver;
 public abstract class Subject {
     public abstract void register(IFeatureObserver observer);
     public abstract void unregister(IFeatureObserver observer);
-    public abstract void notifyObserver(IFeatureObserver observer);
+    public abstract void notifyObserver(List<Measurement> measureList, IFeatureObserver observer);
     public abstract void notifyAllObserver();
     
 }

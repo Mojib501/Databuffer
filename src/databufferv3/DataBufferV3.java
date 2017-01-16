@@ -31,7 +31,9 @@ import java.util.Queue;
 //import java.util.concurrent.LinkedBlockingQueue;
 
 /**
- *
+ *TODO Buffer muss geleert werden
+ *     Buffer grenzen festlegen
+ *     Buffer Thread-sicher machen
  * @author mojib
  */
 public class DataBufferV3 extends Subject implements IDataObserver{
@@ -40,15 +42,15 @@ public class DataBufferV3 extends Subject implements IDataObserver{
      */ 
     //Das ist nur ein test
     Map<IFeatureObserver, Queue<Measurement>> queueMap = new LinkedHashMap<IFeatureObserver, Queue<Measurement>>();
-    List<Measurement> measureList = new LinkedList<Measurement>();
-    List<IFeatureObserver> observerList = new ArrayList<IFeatureObserver>();
-    List<DataMessageSingle> singleMsgList = new LinkedList<DataMessageSingle>();
+    List<Measurement> measureList;
+    List<IFeatureObserver> features = new LinkedList<>();
 //    
 //    
 //    
 //    
     @Override
     public void register(IFeatureObserver observer) {
+        features.add(observer);
         queueMap.put(observer, null);
     }
 
@@ -57,13 +59,15 @@ public class DataBufferV3 extends Subject implements IDataObserver{
         queueMap.remove(observer);
     }
     @Override
-    public void notifyObserver(IFeatureObserver observer){
-        //bestimmte observer benachtichtigen
+    public void notifyObserver(List<Measurement> measureList, IFeatureObserver observer){
+        //bestimmten observer benachtichtigen und liste übergeben
         observer.update(measureList);
+        //wenn nachricht versendet wurde dann aus dem buffer löschen
+        
     }
     @Override
     public void notifyAllObserver() {
-        for(IFeatureObserver observer : observerList){
+        for(Entry e: queueMap.entrySet()){
             //alle observer benachrichtigen
         }
     }
@@ -78,19 +82,11 @@ public class DataBufferV3 extends Subject implements IDataObserver{
             @Override 
             public void processMessage(DataMessageSingle singleMsg){
                 messageController(singleMsg);
-//                //prüfen ob es schon eine objekt von Measurement und QueueIdentifier gibt
-//                if(queueMap.containsKey(desc))
-//                    queueMap.get(desc).offer(new Measurement(singleMsg, timeStamp, mdID));
-//                else{
-//                    QueueIdentifier queueIdentifier = new QueueIdentifier(desc, mdID);
-//                    Measurement measurement = new Measurement(singleMsg, timeStamp, mdID);
-//                    queueMap.get(queueIdentifier).offer(measurement);
-//                    }
                 }
         });
     }
     //sortiert die messdaten zu den jeweiligen features und füllt die queue
-    public void messageController(DataMessageSingle singleMsg){
+    private void messageController(DataMessageSingle singleMsg){
         IDeviceDescriptor desc = singleMsg.getSensorUnit().getDeviceDescriptor();
         int mdId = singleMsg.getMeasurementDeviceID();
         long timeStamp = singleMsg.getTime();
@@ -98,31 +94,19 @@ public class DataBufferV3 extends Subject implements IDataObserver{
             for(Entry<IFeatureObserver,Queue<Measurement>> e : queueMap.entrySet()){
                 if(e.getKey().get_qId()==qId){
                     queueMap.get(e).offer(new Measurement(singleMsg, timeStamp, mdId));
+                    isAdded(e.getKey(), e.getValue().peek());
                     }
                 }
     }
-    public List<Measurement> getData(){
-        
-        return measureList;
+    public void sendData(IFeatureObserver key){
+        measureList= new LinkedList<Measurement>();
+        Queue<Measurement> queue = queueMap.get(key);
+        for(Measurement e : queue){
+            measureList.add(e);
+            }
+        notifyObserver(measureList, key);
     }
-//    public List<Measurement> getData(){
-//        // die queue mit der passenden id aus der map holen
-//        
-//        Queue queue = queueMap.get(queueIdentifier);
-//        Iterator<Measurement> iterator = queue.iterator();
-//        Measurement firstElement = this.getFirstElement(queue);
-//        Measurement lastElement = this.getLastElement(queue);
-//        //prüfen ob genug Messdaten im puffer sind
-//        if(TEnd <= lastElement.getTimeStamp() && TBegin >= firstElement.getTimeStamp() ){
-//            //durch die Queue iterieren und Messdaten in Liste eintragen
-//            while(iterator.hasNext()){
-//                if(TEnd<=iterator.next().getTimeStamp() && TBegin>=iterator.next().getTimeStamp())
-//                {measureList.add(iterator.next());}
-//            }
-//        }
-//        else measureList.add(null);
-//            return measureList;
-//    }
+
     public Measurement getFirstElement(Queue<Measurement> queue){
         Iterator<Measurement> iter = queue.iterator();
         Measurement firstElement = iter.next();
@@ -139,5 +123,12 @@ public class DataBufferV3 extends Subject implements IDataObserver{
                 lastElement = iterator.next();
             }
         return lastElement;    
+    }
+
+    private void isAdded(IFeatureObserver key,Measurement value){
+        if(value.getCounter() < key.get_deltaTimeStamp())    
+            value.count();
+        else 
+            sendData(key);
     }
 }
