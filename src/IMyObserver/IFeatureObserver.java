@@ -16,9 +16,10 @@ import java.util.List;
  */
 public interface IFeatureObserver {
     public abstract void update(List<Measurement> measureList);
-    public abstract QueueIdentifier get_qId();
-    public abstract int get_deltaTimeStamp();
-    public abstract Channel get_channel();
+    public abstract List<QueueIdentifier> getQIdList();
+    public abstract double getOverlabFactor();
+    public abstract int getDeltaTimeStamp();
+    public abstract Channel getChannel();
     
 
     

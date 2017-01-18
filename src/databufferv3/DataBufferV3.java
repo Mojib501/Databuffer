@@ -20,6 +20,7 @@ import de.hsulm.cermit.messages.RspMeasurementDeviceCfg;
 import de.hsulm.cermit.sensorunitmodel.MeasurementDevice;
 import de.hsulm.cermit.sensorunitmodel.Channel;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -41,17 +42,26 @@ public class DataBufferV3 extends Subject implements IDataObserver{
      * @param args the command line arguments
      */ 
     //Das ist nur ein test
-    Map<IFeatureObserver, Queue<Measurement>> queueMap = new LinkedHashMap<IFeatureObserver, Queue<Measurement>>();
-    List<Measurement> measureList;
-    List<IFeatureObserver> features = new LinkedList<>();
+    //Map<IFeatureObserver, Map<Queue<Measurement>>> queueMap = new LinkedHashMap<IFeatureObserver, <Measurement>>();
+    //List<Measurement> measureList;
+    //List<IFeatureObserver> features = new LinkedList<>();
+    HashMap<IFeatureObserver, HashMap<QueueIdentifier,Queue<Measurement>>> 
+            queueMap = new LinkedHashMap<IFeatureObserver,HashMap<QueueIdentifier,Queue<Measurement>>>();
+    HashMap<QueueIdentifier,Queue<Measurement>>
+            deepQueueMap = new HashMap<QueueIdentifier,Queue<Measurement>>();
+    //Map<QueueIdentifier,Queue<Measurement>> queueMap2 = new HashMap<QueueIdentifier,Queue<Measurement>>();
+    //HashMap<String, HashMap<String,String>> gens = new HashMap<String,HashMap<String,String>>();
+    
 //    
 //    
 //    
 //    
     @Override
     public void register(IFeatureObserver observer) {
-        features.add(observer);
-        queueMap.put(observer, null);
+        List<QueueIdentifier> qIdList = observer.getQIdList();
+        //schreibt die qIDs in die deepQueueMap
+        deviceController(qIdList);
+        queueMap.put(observer,deepQueueMap);
     }
 
     @Override
@@ -91,22 +101,13 @@ public class DataBufferV3 extends Subject implements IDataObserver{
         int mdId = singleMsg.getMeasurementDeviceID();
         long timeStamp = singleMsg.getTime();
         QueueIdentifier qId = new QueueIdentifier(desc,mdId);
-            for(Entry<IFeatureObserver,Queue<Measurement>> e : queueMap.entrySet()){
-                if(e.getKey().get_qId()==qId){
-                    queueMap.get(e).offer(new Measurement(singleMsg, timeStamp, mdId));
-                    isAdded(e.getKey(), e.getValue().peek());
-                    }
-                }
+        deepQueueMap.get(qId).offer(new Measurement(singleMsg, timeStamp, mdId));
+        bufferControl();
     }
-    public void sendData(IFeatureObserver key){
-        measureList= new LinkedList<Measurement>();
-        Queue<Measurement> queue = queueMap.get(key);
-        for(Measurement e : queue){
-            measureList.add(e);
-            }
-        notifyObserver(measureList, key);
+    private void bufferControl(){
+        //controlliert ob eine gewisse queue genug daten hat 
+        //wenn ja notifyObserver()
     }
-
     public Measurement getFirstElement(Queue<Measurement> queue){
         Iterator<Measurement> iter = queue.iterator();
         Measurement firstElement = iter.next();
@@ -124,7 +125,9 @@ public class DataBufferV3 extends Subject implements IDataObserver{
             }
         return lastElement;    
     }
-
+    private void deviceController(List<QueueIdentifier> list){
+        //schreibt alle qIds als key in die map 
+        }
     private void isAdded(IFeatureObserver key,Measurement value){
         if(value.getCounter() < key.get_deltaTimeStamp())    
             value.count();
