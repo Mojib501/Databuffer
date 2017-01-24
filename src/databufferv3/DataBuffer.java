@@ -39,11 +39,10 @@ import jdk.nashorn.internal.runtime.JSType;
  *     Buffer in measageController eine exception auswerfen fall keine qID
  * @author mojib
  */
-public class DataBufferV3 extends Subject implements IDataObserver{
+public class DataBuffer extends Subject implements IDataObserver{
     /**
      * @param args the command line arguments
      */ 
-    //Das ist nur ein test
     HashMap<IFeatureObserver,HashMap<QueueIdentifier,Queue<Measurement>>> queueMap = new LinkedHashMap<>();
 //    
 //    
@@ -51,8 +50,7 @@ public class DataBufferV3 extends Subject implements IDataObserver{
 //    
     @Override
     public void register(IFeatureObserver observer) {
-        //stellt pro qId eine Queue her
-        //pro observer/Feature einer eine map mit key=qid und value=queue
+        //pro observer/Feature eine map mit key=qid und value=queue
         queueMap.put(observer, deviceController(observer.getQIdList()));
     }
     @Override
@@ -75,7 +73,8 @@ public class DataBufferV3 extends Subject implements IDataObserver{
 //    
 //    
 //    
-//    
+//  
+    @Override
     public void update(DataMessage dataMessage){
            dataMessage.processDataMessage(new IDataMessageHelper() {
         // jedes mal wenn eine neues device connected wird eine neue Queue 
@@ -102,10 +101,13 @@ public class DataBufferV3 extends Subject implements IDataObserver{
     }
     public void bufferControl(IFeatureObserver feature,Queue<Measurement> queue){
         int deltaTime = feature.getDeltaTimeStamp();
+        //if(delaTime <= letztesElement - erstesElement)
         if(deltaTime <= (getLastElement(queue).getTimeStamp()-getFirstElement(queue).getTimeStamp()))
             notifyObserver(feature);
-            int cutBoundary = queue.size()*feature.getDeltaTimeStamp();
-        while(cutBoundary <= queue.size()){
+        //überlappungs algorithmus
+        //noch zu überarbeiten!!!
+            int cutBorder = queue.size()*feature.getDeltaTimeStamp();
+        while(cutBorder > queue.size()){
             queue.remove();
         }
     }       

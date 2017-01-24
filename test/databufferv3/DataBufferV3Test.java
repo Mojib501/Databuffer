@@ -42,8 +42,8 @@ public class DataBufferV3Test {
     
     @Before
     public void setUp() {
-        Measurement m1 = new Measurement(new DataMessageSingle(), 2, 1);
-        Measurement m2 = new Measurement(new DataMessageSingle(), 3, 2);
+        m1 = new Measurement(new DataMessageSingle(), 2, 1);
+        m2 = new Measurement(new DataMessageSingle(), 3, 2);
     }
     
     @After
@@ -57,7 +57,7 @@ public class DataBufferV3Test {
     public void testRegister() {
         System.out.println("register");
         IFeatureObserver observer = null;
-        DataBufferV3 instance = new DataBufferV3();
+        DataBuffer instance = new DataBuffer();
         instance.register(observer);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
@@ -70,7 +70,7 @@ public class DataBufferV3Test {
     public void testUnregister() {
         System.out.println("unregister");
         IFeatureObserver observer = null;
-        DataBufferV3 instance = new DataBufferV3();
+        DataBuffer instance = new DataBuffer();
         instance.unregister(observer);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
@@ -83,7 +83,7 @@ public class DataBufferV3Test {
     public void testNotifyObserver() {
         System.out.println("notifyObserver");
         IFeatureObserver observer = null;
-        DataBufferV3 instance = new DataBufferV3();
+        DataBuffer instance = new DataBuffer();
         instance.notifyObserver(observer);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
@@ -95,7 +95,7 @@ public class DataBufferV3Test {
     @Test
     public void testNotifyAllObserver() {
         System.out.println("notifyAllObserver");
-        DataBufferV3 instance = new DataBufferV3();
+        DataBuffer instance = new DataBuffer();
         instance.notifyAllObserver();
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
@@ -108,7 +108,7 @@ public class DataBufferV3Test {
     public void testUpdate() {
         System.out.println("update");
         DataMessage dataMessage = null;
-        DataBufferV3 instance = new DataBufferV3();
+        DataBuffer instance = new DataBuffer();
         instance.update(dataMessage);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
@@ -120,9 +120,9 @@ public class DataBufferV3Test {
     @Test
     public void testBufferControl() {
         System.out.println("bufferControl");
-        IFeatureObserver feature = null;s
+        IFeatureObserver feature = null;
         Queue<Measurement> queue = null;
-        DataBufferV3 instance = new DataBufferV3();
+        DataBuffer instance = new DataBuffer();
         instance.bufferControl(feature, queue);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
@@ -134,7 +134,7 @@ public class DataBufferV3Test {
     @Test
     public void testGetFirstElement() {
         System.out.println("getFirstElement");
-        DataBufferV3 instance = new DataBufferV3();
+        DataBuffer instance = new DataBuffer();
         assertEquals(queue.peek(), instance.getFirstElement(queue));
         // TODO review the generated test code and remove the default call to fail.
         //fail("The test case is a prototype.");
@@ -149,7 +149,7 @@ public class DataBufferV3Test {
         //Queue<Measurement> queue = null;
         queue.add(m1);
         queue.add(m2);
-        DataBufferV3 instance = new DataBufferV3();
+        DataBuffer instance = new DataBuffer();
         
         Measurement expResult = m2;
         Measurement result = instance.getLastElement(queue);
