@@ -82,6 +82,7 @@ public class AppController implements IStateChangedCallback{
         dataBuffer = new DataBuffer();
     }
     
+    public SensorUnit sensorUnit;
     
     public void connectSensorUnit(IDeviceDescriptor devDesc){
         
@@ -108,12 +109,12 @@ public class AppController implements IStateChangedCallback{
         // connect to the device...
         //TODO: registrieren des DataBuffers als DataObserver
         
-        SensorUnit sensorUnit = cermitController.connect(devDesc, suFactory, this, ctrlObs, dataBuffer);
+        this.sensorUnit = cermitController.connect(devDesc, suFactory, this, ctrlObs, dataBuffer);
 
-        if (sensorUnit!=null) {
+        if (this.sensorUnit!=null) {
             System.out.println("Connected.");
             // open connection
-            sensorUnit.open();
+            this.sensorUnit.open();
         } else {
             System.out.println("Not connected.");
             return;

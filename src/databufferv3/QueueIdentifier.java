@@ -12,22 +12,22 @@ import de.hsulm.cermit.exchangableinterface.IDeviceDescriptor;
  * @author mojib
  */
 public class QueueIdentifier {
-    private IDeviceDescriptor desc;
-    private int measurmentDeviceID;
+    private static IDeviceDescriptor desc;
+    private static int mdId;
+    private static QueueIdentifier queueIdentifier;
     
-    public QueueIdentifier(IDeviceDescriptor desc, int measurmentDeviceId){
-        this.desc=desc;
-        this.measurmentDeviceID=measurmentDeviceId;
+    public QueueIdentifier(IDeviceDescriptor desc, int mdId){
+     this.mdId = mdId;
+     this.desc = desc;
+     }
+    public static QueueIdentifier getInstanz(IDeviceDescriptor desc, int mdId){
+        queueIdentifier = new QueueIdentifier(desc, mdId);
+        return queueIdentifier;
     }
     public IDeviceDescriptor getDesc(){
-        return desc;
+        return this.desc;
     }
     public int getmDid(){
-        return measurmentDeviceID;
+        return this.mdId;
     }
-    public String toString(){
-        return null;
-    }
-    
-    
 }

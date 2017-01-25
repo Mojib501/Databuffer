@@ -22,6 +22,7 @@ import de.hsulm.cermit.sensorunitmodel.Channel;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -44,6 +45,7 @@ public class DataBuffer extends Subject implements IDataObserver{
      * @param args the command line arguments
      */ 
     HashMap<IFeatureObserver,HashMap<QueueIdentifier,Queue<Measurement>>> queueMap = new LinkedHashMap<>();
+    HashMap<QueueIdentifier,Queue<Measurement>> deepQueueMap;
 //    
 //    
 //    
@@ -51,7 +53,7 @@ public class DataBuffer extends Subject implements IDataObserver{
     @Override
     public void register(IFeatureObserver observer) {
         //pro observer/Feature eine map mit key=qid und value=queue
-        queueMap.put(observer, deviceController(observer.getQIdList()));
+        queueMap.put(observer, controlDevice(observer.getQIdList()));
     }
     @Override
     public void unregister(IFeatureObserver observer) {
@@ -81,35 +83,37 @@ public class DataBuffer extends Subject implements IDataObserver{
         // für dieses speziele Device erzeugt.
             @Override 
             public void processMessage(DataMessageSingle singleMsg){
-                messageController(singleMsg);
+                controlMessage(singleMsg);
                 }
         });
     }
     //sortiert die messdaten zu den jeweiligen features und füllt die queue
-    private void messageController(DataMessageSingle singleMsg){
+    private void controlMessage(DataMessageSingle singleMsg){
         IDeviceDescriptor desc = singleMsg.getSensorUnit().getDeviceDescriptor();
         int mdId = singleMsg.getMeasurementDeviceID();
         long timeStamp = singleMsg.getTime();
-        QueueIdentifier qId = new QueueIdentifier(desc,mdId);
+        QueueIdentifier qId = QueueIdentifier.getInstanz(desc, mdId);
         //äussere Map
         for(Map.Entry<IFeatureObserver,HashMap<QueueIdentifier,Queue<Measurement>>> map:queueMap.entrySet()){
             //innere Map
             //Measurement zu der jeweiligen qId erstellen
-            map.getValue().get(qId).offer(new Measurement(singleMsg, timeStamp, mdId));
-            bufferControl(map.getKey(),map.getValue().get(qId));
+            map.getValue().get(qId).offer(Measurement.getInstance(singleMsg, timeStamp, mdId));
+            controlBuffer(map.getKey(),map.getValue().get(qId));
         }
     }
-    public void bufferControl(IFeatureObserver feature,Queue<Measurement> queue){
-        int deltaTime = feature.getDeltaTimeStamp();
-        //if(delaTime <= letztesElement - erstesElement)
-        if(deltaTime <= (getLastElement(queue).getTimeStamp()-getFirstElement(queue).getTimeStamp()))
-            notifyObserver(feature);
-        //überlappungs algorithmus
-        //noch zu überarbeiten!!!
-            int cutBorder = queue.size()*feature.getDeltaTimeStamp();
-        while(cutBorder > queue.size()){
-            queue.remove();
-        }
+    public void controlBuffer(IFeatureObserver feature,Queue<Measurement> queue){
+//        int deltaTime = feature.getDeltaTimeStamp();
+//        //if(deltaTime <= (getLastElement(queue).getTimeStamp()-getFirstElement(queue).getTimeStamp()))
+//        if(deltaTime <  queue.size()){
+//        notifyObserver(feature);
+//        //überlappungs algorithmus
+//        //noch zu überarbeiten!!!
+//        int cutBorder = queue.size()*feature.getDeltaTimeStamp();
+//            while(cutBorder > queue.size()){
+//            queue.remove();
+//            }
+//        }
+        notifyObserver(feature);
     }       
     public Measurement getFirstElement(Queue<Measurement> queue){
         return queue.peek();
@@ -123,12 +127,11 @@ public class DataBuffer extends Subject implements IDataObserver{
         return lastElement;    
     }
     //erzeugt eine map mit key= qId , value = Queue
-    private HashMap<QueueIdentifier,Queue<Measurement>> deviceController(List<QueueIdentifier> list){
-        HashMap<QueueIdentifier,Queue<Measurement>>
+    private HashMap<QueueIdentifier,Queue<Measurement>> controlDevice(List<QueueIdentifier> list){
+        
         deepQueueMap = new HashMap<QueueIdentifier,Queue<Measurement>>();
-   
         for(QueueIdentifier e : list){
-            deepQueueMap.put(e, new LinkedBlockingQueue<>());
+            deepQueueMap.put(e, new LinkedList<Measurement>());
             }
         return deepQueueMap;
     }

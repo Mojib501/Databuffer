@@ -22,7 +22,7 @@ public interface IFeatureObserver {
     public abstract double getOverlabFactor();
     public abstract int getDeltaTimeStamp();
     public abstract Channel getChannel();
-    public abstract void calc();
+    //public abstract void calc();
 
     
 }

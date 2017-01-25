@@ -24,7 +24,7 @@ public class Feature1 implements IFeatureObserver{
   
     private int deltaTimeStamp;
     private Channel channel;
-    private List<QueueIdentifier> qId;
+    private List<QueueIdentifier> qIdList = new LinkedList<>();
     private double overlabFactor;    
     private HashMap<QueueIdentifier, Queue<Measurement>> messageMap;
     private Queue<Measurement> queue;
@@ -32,11 +32,10 @@ public class Feature1 implements IFeatureObserver{
     private Iterator<Measurement> iter;
     
     
-    public Feature1() {
-    qId = new LinkedList<>();
-    queueIdentifier = new QueueIdentifier(new BluetoothDeviceDescriptor("0007806e65b0","UNIT-Rev3-ID-4"), 2);
-    qId.add(queueIdentifier);
-    deltaTimeStamp = 1;
+    public Feature1(IDeviceDescriptor desc, int mdId) {
+    queueIdentifier = new QueueIdentifier(desc,mdId);
+    qIdList.add(queueIdentifier);
+    deltaTimeStamp = 2;
     overlabFactor = 1;
     
     }
@@ -44,12 +43,12 @@ public class Feature1 implements IFeatureObserver{
 //    
 //    
 //    
-    @Override
     public void calc() {
      queue = messageMap.get(queueIdentifier);
         iter = queue.iterator();
         while (iter.hasNext()) {
             System.out.println("Data Message is : " + iter.next().getMetrics());
+            iter.remove();
         }
             
     }
@@ -64,7 +63,7 @@ public class Feature1 implements IFeatureObserver{
     @Override
     public List<QueueIdentifier> getQIdList() {
         
-        return this.qId;
+        return this.qIdList;
     }
     @Override
     public int getDeltaTimeStamp() {

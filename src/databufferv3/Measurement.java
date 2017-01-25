@@ -23,6 +23,9 @@ public class Measurement {
          this.timeStamp=timeStamp;
          this.mdID=mdID;
      }
+    public static Measurement getInstance(DataMessageSingle singleMsg, long timeStamp, int mdID){
+        return new Measurement(singleMsg, timeStamp, mdID);
+    }
     public long getTimeStamp(){
         return timeStamp;
     }
@@ -34,8 +37,5 @@ public class Measurement {
     }
     public int getCounter(){
         return this.counter;
-    }
-    public String toString(){
-        return null;
     }
 }

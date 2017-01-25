@@ -123,7 +123,7 @@ public class DataBufferV3Test {
         IFeatureObserver feature = null;
         Queue<Measurement> queue = null;
         DataBuffer instance = new DataBuffer();
-        instance.bufferControl(feature, queue);
+        instance.controlBuffer(feature, queue);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
     }
